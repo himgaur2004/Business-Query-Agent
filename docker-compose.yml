@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: bqa-postgres
+    environment:
+      POSTGRES_USER: bqa
+      POSTGRES_PASSWORD: bqa_dev_pass
+      POSTGRES_DB: bqa_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/ai-service/tests/fixtures/seed.sql:/docker-entrypoint-initdb.d/01-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bqa -d bqa_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── AI Service ─────────────────────────────────────────────────────────────
+  ai-service:
+    build:
+      context: ./backend/ai-service
+      dockerfile: Dockerfile
+    container_name: bqa-ai-service
+    ports:
+      - "8000:80"
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      DATABASE_URL: postgresql://bqa:bqa_dev_pass@postgres:5432/bqa_db
+      DATABASE_READ_REPLICA_URL: postgresql://bqa:bqa_dev_pass@postgres:5432/bqa_db
+      PORT: 80
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Gateway ────────────────────────────────────────────────────────────────
+  gateway:
+    build:
+      context: ./backend/gateway
+      dockerfile: Dockerfile
+    container_name: bqa-gateway
+    ports:
+      - "3001:80"
+    environment:
+      PORT: 80
+      NODE_ENV: development
+      AI_SERVICE_URL: http://ai-service:80
+      DATABASE_URL: postgresql://bqa:bqa_dev_pass@postgres:5432/bqa_db
+      ALLOWED_ORIGIN: http://localhost:5173
+    depends_on:
+      ai-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

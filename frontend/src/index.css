@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: #0f172a;
+    --color-surface: #1e293b;
+    --color-border: #334155;
+    --color-text: #f1f5f9;
+    --color-muted: #94a3b8;
+    --color-accent: #3b82f6;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+
+  ::selection {
+    background: rgba(59, 130, 246, 0.3);
+    color: #f1f5f9;
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+  }
+
+  .glass-strong {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(51, 65, 85, 0.6);
+  }
+
+  .btn-primary {
+    @apply bg-brand-600 hover:bg-brand-500 text-white font-medium px-5 py-2.5 rounded-xl
+           transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-surface-900
+           active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-surface-700 text-slate-300 hover:text-white font-medium px-4 py-2 rounded-lg
+           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-surface-600;
+  }
+
+  .input-field {
+    @apply bg-surface-800 border border-surface-700 rounded-xl px-4 py-3 text-slate-100
+           placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           transition-all duration-200 w-full font-mono;
+  }
+
+  .card {
+    @apply bg-surface-800 border border-surface-700 rounded-2xl p-6;
+  }
+
+  .tag {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface) 25%,
+      rgba(71, 85, 105, 0.5) 50%,
+      var(--color-surface) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
